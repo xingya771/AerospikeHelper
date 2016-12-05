@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jdbc.aerospikehelper;
+package com.ojdbc.aerospikehelper.bean;
 
-import com.ojdbc.aerospikehelper.bean.ConnectionInfo;
-import com.ojdbc.aerospikehelper.bean.ConnectionInfo_namespace;
 import com.ojdbc.aerospikehelper.util.AerospikeDAO;
 import com.ojdbc.aerospikehelper.util.LRUCache;
 import java.util.ArrayList;

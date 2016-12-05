@@ -5,7 +5,7 @@
  */
 package com.ojdbc.aerospikehelper.ui;
 
-import com.jdbc.aerospikehelper.Connections;
+import com.ojdbc.aerospikehelper.bean.Connections;
 import com.ojdbc.aerospikehelper.bean.ConnectionInfo;
 import com.ojdbc.aerospikehelper.bean.ConnectionInfo_set;
 import com.ojdbc.aerospikehelper.bean.ConnectionInfo_namespace;
