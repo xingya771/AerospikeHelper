@@ -10,6 +10,7 @@ import com.ojdbc.aerospikehelper.bean.AerospikeRow;
 import com.ojdbc.aerospikehelper.bean.ConnectionInfo_set;
 import com.ojdbc.aerospikehelper.util.AerospikeDAO;
 import com.ojdbc.aerospikehelper.util.AerospikeUtil;
+import com.ojdbc.aerospikehelper.util.StackUtil;
 import com.ojdbc.aerospikehelper.util.StringUtil;
 import com.ojdbc.aerospikehelper.util.UIUtil;
 import java.awt.Toolkit;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -43,9 +45,13 @@ public class ViewerJPanel extends javax.swing.JPanel {
         init();
         UIUtil.setKeyMask(commandJTA);
         Executors.newSingleThreadExecutor().execute(() -> {
-            dao = new AerospikeDAO(connectionInfo_all.getIp(), connectionInfo_all.getPort());
-            this.commandJTA.setText("select * from " + connectionInfo_all.getNamespace() + "." + connectionInfo_all.getSetName());
-            showTable(null);
+            try {
+                dao = new AerospikeDAO(connectionInfo_all.getIp(), connectionInfo_all.getPort());
+                this.commandJTA.setText("select * from " + connectionInfo_all.getNamespace() + "." + connectionInfo_all.getSetName());
+                showTable(null);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
+            }
 
         });
     }
@@ -146,17 +152,23 @@ public class ViewerJPanel extends javax.swing.JPanel {
         if (evt.getKeyCode() == KeyEvent.VK_R && ((evt.getModifiers() & MASK) != 0 || evt.isControlDown())) {
             ((DefaultTableModel) resultJTB.getModel()).setColumnCount(0);
             mode = null;
-            parseWhere(commandJTA.getText());
+            Executors.newSingleThreadExecutor().execute(() -> {
+                whereFilter(commandJTA.getText());
+            });
 
         }
     }//GEN-LAST:event_commandJTAKeyReleased
-    private void parseWhere(String command) {
+    private void whereFilter(String command) {
         if (command == null) {
             return;
         }
+        try {
+            Map<String, String> wheres = StringUtil.parseWhere(command);
+            showTable(wheres);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
+        }
 
-        Map<String, String> wheres = StringUtil.parseWhere(command);
-        showTable(wheres);
     }
 
     private void init() {
@@ -215,23 +227,23 @@ public class ViewerJPanel extends javax.swing.JPanel {
                 (k, v) -> {
 
                     boolean isAdd = false;
-                    int hitCount=0;
+                    int hitCount = 0;
                     if (wheres != null) {
                         for (Map.Entry<String, String> entry : wheres.entrySet()) {
                             if (v.bins != null && v.bins.containsKey(entry.getKey())) {
                                 if (v.bins.get(entry.getKey()).toString().contains(entry.getValue())) {
                                     isAdd = true;
-                                    hitCount+=1;
+                                    hitCount += 1;
                                 }
                             }
-                            
-                            if(entry.getKey().equals("PK")){
-                                isAdd=(k.userKey+"").contains(entry.getValue());
+
+                            if (entry.getKey().equals("PK")) {
+                                isAdd = (k.userKey + "").contains(entry.getValue());
                             }
                         }
                     }
                     colsSet.addAll(v.bins.keySet());
-                    if (wheres == null||hitCount==wheres.size()||(wheres.size()==2&&wheres.containsKey("rownum_begin"))) {
+                    if (wheres == null || hitCount == wheres.size() || (wheres.size() == 2 && wheres.containsKey("rownum_begin"))) {
                         allRecords.add(new AerospikeRow(k.userKey + "", v.bins));
                         count[0] += 1;
 
