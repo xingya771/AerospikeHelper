@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.control.TreeCell;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -172,9 +171,7 @@ public class MainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_add_connectJBNMouseReleased
 
     private void dbListTreeExpanded(javax.swing.event.TreeExpansionEvent evt) {//GEN-FIRST:event_dbListTreeExpanded
-        TreePath path = evt.getPath();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        System.out.println("节点" + node + "被展开");
+        //do nothing
     }//GEN-LAST:event_dbListTreeExpanded
 
     private void dbListTreeWillExpand(javax.swing.event.TreeExpansionEvent evt)throws javax.swing.tree.ExpandVetoException {//GEN-FIRST:event_dbListTreeWillExpand

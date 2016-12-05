@@ -6,7 +6,6 @@
 package com.ojdbc.aerospikehelper.ui;
 
 import com.aerospike.client.Key;
-import com.aerospike.client.Record;
 import com.ojdbc.aerospikehelper.bean.AerospikeRow;
 import com.ojdbc.aerospikehelper.bean.ConnectionInfo_set;
 import com.ojdbc.aerospikehelper.util.AerospikeDAO;
@@ -18,7 +17,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -148,8 +146,6 @@ public class ViewerJPanel extends javax.swing.JPanel {
         if (evt.getKeyCode() == KeyEvent.VK_R && ((evt.getModifiers() & MASK) != 0 || evt.isControlDown())) {
             ((DefaultTableModel) resultJTB.getModel()).setColumnCount(0);
             mode = null;
-            System.out.println("reload");
-
             parseWhere(commandJTA.getText());
 
         }
@@ -235,7 +231,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
                         }
                     }
                     colsSet.addAll(v.bins.keySet());
-                    if (wheres == null||hitCount==wheres.size()) {
+                    if (wheres == null||hitCount==wheres.size()||(wheres.size()==2&&wheres.containsKey("rownum_begin"))) {
                         allRecords.add(new AerospikeRow(k.userKey + "", v.bins));
                         count[0] += 1;
 
@@ -281,7 +277,6 @@ public class ViewerJPanel extends javax.swing.JPanel {
             }
         }
         end = end > rows.size() ? rows.size() : end;
-        System.out.println(begin + "|" + end);
         for (int i = begin; i < end; i++) {
             mode.addRow(rows.get(i));
         }
