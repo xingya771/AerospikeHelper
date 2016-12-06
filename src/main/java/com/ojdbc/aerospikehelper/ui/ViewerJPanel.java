@@ -215,6 +215,17 @@ public class ViewerJPanel extends javax.swing.JPanel {
     }
 
     public void showTable(Map<String, String> wheres) {
+        int begin = 0;
+        int end = maxRowsCount;
+        if (wheres!=null&&wheres.containsKey("rownum_begin")) {
+            begin = Integer.parseInt(wheres.get("rownum_begin"));
+            wheres.remove("rownum_begin");
+        }
+
+        if (wheres!=null&&wheres.containsKey("rownum_end")) {
+            end = Integer.parseInt(wheres.get("rownum_end"));
+            wheres.remove("rownum_end");
+        }
         List<Object[]> rows = new ArrayList<>();
         List<AerospikeRow> allRecords = new ArrayList<>();
         int count[] = new int[3];
@@ -226,24 +237,25 @@ public class ViewerJPanel extends javax.swing.JPanel {
                 connectionInfo_all.getSetName(), null, null),
                 (k, v) -> {
 
-                    boolean isAdd = false;
                     int hitCount = 0;
                     if (wheres != null) {
                         for (Map.Entry<String, String> entry : wheres.entrySet()) {
                             if (v.bins != null && v.bins.containsKey(entry.getKey())) {
                                 if (v.bins.get(entry.getKey()).toString().contains(entry.getValue())) {
-                                    isAdd = true;
                                     hitCount += 1;
                                 }
                             }
 
                             if (entry.getKey().equals("PK")) {
-                                isAdd = (k.userKey + "").contains(entry.getValue());
+                                boolean isAdd = (k.userKey + "").contains(entry.getValue());
+                                if (isAdd) {
+                                    hitCount += 1;
+                                }
                             }
                         }
                     }
                     colsSet.addAll(v.bins.keySet());
-                    if (wheres == null || hitCount == wheres.size() || (wheres.size() == 2 && wheres.containsKey("rownum_begin"))) {
+                    if (wheres == null || hitCount == wheres.size()) {
                         allRecords.add(new AerospikeRow(k.userKey + "", v.bins));
                         count[0] += 1;
 
@@ -251,13 +263,14 @@ public class ViewerJPanel extends javax.swing.JPanel {
                 });
 
         Object[] cols = new Object[colsSet.size() + 1];
-        int ii = 1;
+        
         mode = new DefaultTableModel() {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
         mode.addColumn("PK");
+        int ii = 1;
         Map<String, Integer> colNameIndex = new HashMap<>();
         for (String row1 : colsSet) {
             cols[ii] = row1;
@@ -267,32 +280,26 @@ public class ViewerJPanel extends javax.swing.JPanel {
         }
 
         resultJTB.setModel(mode);
+        test();
+
+        allRecords.forEach(row -> {
+            rows.add(handler(row, colNameIndex));
+        });
+
+        end = end > rows.size() ? rows.size() : end;
+        for (int i = begin; i < end; i++) {
+            mode.addRow(rows.get(i));
+        }
+
+    }
+
+    public void test() {
         int width = 100;
         int maxWidth = resultJTB.getParent().getParent().getSize().width - 100;
         width = maxWidth / resultJTB.getColumnModel().getColumnCount() > width ? maxWidth / resultJTB.getColumnModel().getColumnCount() : width;
         for (int i = 0; i < resultJTB.getColumnModel().getColumnCount(); i++) {
             resultJTB.getColumnModel().getColumn(i).setMinWidth(width);
         }
-
-        allRecords.forEach(row -> {
-            rows.add(handler(row, colNameIndex));
-        });
-
-        int begin = 0;
-        int end = maxRowsCount > rows.size() ? rows.size() : maxRowsCount;
-        if (wheres != null) {
-            if (wheres.containsKey("rownum_begin")) {
-                begin = Integer.parseInt(wheres.get("rownum_begin"));
-            }
-            if (wheres.containsKey("rownum_end")) {
-                end = Integer.parseInt(wheres.get("rownum_end"));
-            }
-        }
-        end = end > rows.size() ? rows.size() : end;
-        for (int i = begin; i < end; i++) {
-            mode.addRow(rows.get(i));
-        }
-
     }
 
     private Object[] handler(AerospikeRow aRow, Map<String, Integer> index) {
