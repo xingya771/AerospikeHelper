@@ -166,7 +166,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
             Map<String, String> wheres = StringUtil.parseWhere(command);
             showTable(wheres);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
+            JOptionPane.showMessageDialog(this, "Exception:\n" + StackUtil.getStackTrace(e));
         }
 
     }
