@@ -6,13 +6,9 @@
 package com.ojdbc.aerospikehelper.ui;
 
 import com.ojdbc.aerospikehelper.util.UIUtil;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.text.JTextComponent;
 
 /**
  *

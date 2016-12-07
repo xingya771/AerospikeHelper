@@ -5,6 +5,8 @@
  */
 package com.ojdbc.aerospikehelper.util;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,5 +71,23 @@ public class StringUtil {
         }
         return wheres;
 
+    }
+
+    public static String jsonFormatter(String uglyJSONString) {
+        String res = null;
+        try {
+            res = new GsonBuilder().setPrettyPrinting().create().toJson(new JsonParser().parse(uglyJSONString));
+            if (res.startsWith("\"")) {
+                if (res.endsWith("\"")) {
+                    res = res.substring(1, res.length() - 1);
+                } else {
+                    res = res.substring(1);
+                }
+
+            }
+        } catch (Exception e) {
+            res = uglyJSONString;
+        }
+        return res;
     }
 }

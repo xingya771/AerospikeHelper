@@ -12,6 +12,7 @@ import com.ojdbc.aerospikehelper.util.AerospikeDAO;
 import com.ojdbc.aerospikehelper.util.AerospikeUtil;
 import com.ojdbc.aerospikehelper.util.StackUtil;
 import com.ojdbc.aerospikehelper.util.StringUtil;
+import static com.ojdbc.aerospikehelper.util.StringUtil.jsonFormatter;
 import com.ojdbc.aerospikehelper.util.UIUtil;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -128,7 +131,8 @@ public class ViewerJPanel extends javax.swing.JPanel {
             int col = ((JTable) evt.getSource()).columnAtPoint(evt.getPoint());
             Object obj = resultJTB.getModel().getValueAt(row, col);
             if (obj != null) {
-                ShowDetailDialog showDetailDialog = new ShowDetailDialog(null, true, obj.toString());
+                
+                ShowDetailDialog showDetailDialog = new ShowDetailDialog(null, true, jsonFormatter(obj.toString()));
                 showDetailDialog.setVisible(true);
             }
 
@@ -215,14 +219,19 @@ public class ViewerJPanel extends javax.swing.JPanel {
     }
 
     public void showTable(Map<String, String> wheres) {
+        JDialog d = new JDialog();
+        d.add(new JLabel("       loading..."));
+        d.setSize(200, 100);
+        d.setLocationRelativeTo(null);
+        d.setVisible(true);
         int begin = 0;
         int end = maxRowsCount;
-        if (wheres!=null&&wheres.containsKey("rownum_begin")) {
+        if (wheres != null && wheres.containsKey("rownum_begin")) {
             begin = Integer.parseInt(wheres.get("rownum_begin"));
             wheres.remove("rownum_begin");
         }
 
-        if (wheres!=null&&wheres.containsKey("rownum_end")) {
+        if (wheres != null && wheres.containsKey("rownum_end")) {
             end = Integer.parseInt(wheres.get("rownum_end"));
             wheres.remove("rownum_end");
         }
@@ -263,7 +272,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
                 });
 
         Object[] cols = new Object[colsSet.size() + 1];
-        
+
         mode = new DefaultTableModel() {
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -290,7 +299,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
         for (int i = begin; i < end; i++) {
             mode.addRow(rows.get(i));
         }
-
+        d.setVisible(false);
     }
 
     public void test() {

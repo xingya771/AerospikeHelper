@@ -41,6 +41,11 @@ public class ShowDetailDialog extends javax.swing.JDialog {
         valueJTA.setColumns(20);
         valueJTA.setLineWrap(true);
         valueJTA.setRows(5);
+        valueJTA.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                valueJTAFocusGained(evt);
+            }
+        });
         jScrollPane1.setViewportView(valueJTA);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -56,6 +61,10 @@ public class ShowDetailDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void valueJTAFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_valueJTAFocusGained
+        valueJTA.selectAll();
+    }//GEN-LAST:event_valueJTAFocusGained
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

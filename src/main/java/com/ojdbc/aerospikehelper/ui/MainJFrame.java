@@ -281,6 +281,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 cdl.countDown();
             }
         });
+        
         dialog.getOkJBT().addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 String name_ui = dialog.getNameJTF().getText();
