@@ -13,6 +13,8 @@ import com.ojdbc.aerospikehelper.util.UIUtil;
  */
 public class ShowDetailDialog extends javax.swing.JDialog {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates new form showDetailDialog
      */

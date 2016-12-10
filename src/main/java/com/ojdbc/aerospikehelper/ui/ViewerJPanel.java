@@ -289,7 +289,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
         }
 
         resultJTB.setModel(mode);
-        test();
+        setColWidth();
 
         allRecords.forEach(row -> {
             rows.add(handler(row, colNameIndex));
@@ -302,7 +302,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
         d.setVisible(false);
     }
 
-    public void test() {
+    public void setColWidth() {
         int width = 100;
         int maxWidth = resultJTB.getParent().getParent().getSize().width - 100;
         width = maxWidth / resultJTB.getColumnModel().getColumnCount() > width ? maxWidth / resultJTB.getColumnModel().getColumnCount() : width;

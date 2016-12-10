@@ -35,9 +35,9 @@ public class Toast extends JWindow {
     private final Insets insets = new Insets(12, 24, 12, 24);  
     private int period = 1500;  
     private Font font;  
-    public static final int msg = 0;// 提示 黑色背景色  
-    public static final int success = 1;// 成功提示 浅蓝色背景色  
-    public static final int error = 2;// 错误提示 粉红色背景色  
+    public static final int MSG = 0;// 提示 黑色背景色  
+    public static final int SUCCESS = 1;// 成功提示 浅蓝色背景色  
+    public static final int ERROR = 2;// 错误提示 粉红色背景色  
     private Color background;  
     private Color foreground;  
   
@@ -61,7 +61,7 @@ public class Toast extends JWindow {
      * @param message 
      * @param period 
      * @param type 
-     *            提示类型 msg:黑色背景色 success :浅蓝色背景色  error: 粉红色背景色 
+     *            提示类型 MSG:黑色背景色 SUCCESS :浅蓝色背景色  ERROR: 粉红色背景色 
      */  
     public Toast(Window parent, String message, int period, int type) {  
         super(parent);  
@@ -128,15 +128,15 @@ public class Toast extends JWindow {
      */  
     private void installTheme(int type) {  
         switch (type) {  
-        case msg:  
+        case MSG:  
             background = new Color(0x515151);  
             foreground = Color.WHITE;  
             break;  
-        case success:  
+        case SUCCESS:  
             background = new Color(223, 240, 216);  
             foreground = new Color(49, 112, 143);  
             break;  
-        case error:  
+        case ERROR:  
             background = new Color(242, 222, 222);  
             foreground = new Color(221, 17, 68);  
             break;  

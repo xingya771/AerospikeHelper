@@ -16,8 +16,12 @@ import javax.swing.JTextField;
  */
 public class ConnectDialog extends javax.swing.JDialog {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates new form ConnectDialog
+     * @param parent
+     * @param modal
      */
     public ConnectDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
