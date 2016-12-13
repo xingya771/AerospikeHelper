@@ -336,7 +336,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private void addCard(ConnectionInfo_set ci) {
         ViewerJPanel vjp = new ViewerJPanel();
         vjp.setConnectionInfo_all(ci);
-        jTabbedPane1.addTab(ci.toString(), vjp);
+        jTabbedPane1.addTab(ci.toString()+"["+ci.getName()+"]", vjp);
         jTabbedPane1.setSelectedIndex(jTabbedPane1.getTabCount()-1);
     }
 
