@@ -18,12 +18,15 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -50,8 +53,9 @@ public class ViewerJPanel extends javax.swing.JPanel {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 dao = new AerospikeDAO(connectionInfo_all.getIp(), connectionInfo_all.getPort());
-                this.commandJTA.setText("select * from " + connectionInfo_all.getNamespace() + "." + connectionInfo_all.getSetName());
-                showTable(null);
+                this.commandJTA.setText("select * from " + connectionInfo_all.getNamespace() + "." + connectionInfo_all.getSetName() + " where rownum in (0,100)");
+                JDialog d = showDialog();
+                showTable(null, d);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
             }
@@ -131,7 +135,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
             int col = ((JTable) evt.getSource()).columnAtPoint(evt.getPoint());
             Object obj = resultJTB.getModel().getValueAt(row, col);
             if (obj != null) {
-                
+
                 ShowDetailDialog showDetailDialog = new ShowDetailDialog(null, true, jsonFormatter(obj.toString()));
                 showDetailDialog.setVisible(true);
             }
@@ -168,7 +172,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
         }
         try {
             Map<String, String> wheres = StringUtil.parseWhere(command);
-            showTable(wheres);
+            showTable_thread(wheres);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Exception:\n" + StackUtil.getStackTrace(e));
         }
@@ -218,12 +222,29 @@ public class ViewerJPanel extends javax.swing.JPanel {
         this.connectionInfo_all = connectionInfo_all;
     }
 
-    public void showTable(Map<String, String> wheres) {
+    public void showTable_thread(Map<String, String> wheres) {
+        selectThread.execute(() -> {
+            JDialog d = showDialog();
+            d.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    close();
+                }
+            });
+            this.showTable(wheres, d);
+        });
+    }
+
+    public JDialog showDialog() {
         JDialog d = new JDialog();
         d.add(new JLabel("       loading..."));
         d.setSize(200, 100);
         d.setLocationRelativeTo(null);
         d.setVisible(true);
+        return d;
+    }
+
+    public void showTable(Map<String, String> wheres, JDialog d) {
+
         int begin = 0;
         int end = maxRowsCount;
         if (wheres != null && wheres.containsKey("rownum_begin")) {
@@ -269,7 +290,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
                         count[0] += 1;
 
                     }
-                });
+                }, end);
 
         Object[] cols = new Object[colsSet.size() + 1];
 
@@ -311,6 +332,10 @@ public class ViewerJPanel extends javax.swing.JPanel {
         }
     }
 
+    public void close() {
+        selectThread.shutdownNow();
+    }
+
     private Object[] handler(AerospikeRow aRow, Map<String, Integer> index) {
         Object[] row = new Object[index.size() + 1];
         row[0] = aRow.getPK();
@@ -325,6 +350,7 @@ public class ViewerJPanel extends javax.swing.JPanel {
     private DefaultTableModel mode;
     private ConnectionInfo_set connectionInfo_all;
     private AerospikeDAO dao;
+    private ExecutorService selectThread = Executors.newSingleThreadExecutor();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea commandJTA;
     private javax.swing.JPopupMenu jPopupMenu1;

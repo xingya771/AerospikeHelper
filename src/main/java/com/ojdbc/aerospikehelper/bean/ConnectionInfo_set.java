@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author Arthur
  */
-public class ConnectionInfo_set implements Serializable{
+public class ConnectionInfo_set implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,13 +20,15 @@ public class ConnectionInfo_set implements Serializable{
     private int port;
     private String namespace;
     private String setName;
+    private String objects;
 
-    public ConnectionInfo_set(String name, String ip, int port, String namespace, String setName) {
+    public ConnectionInfo_set(String name, String ip, int port, String namespace, String setName,String objects) {
         this.name = name;
         this.ip = ip;
         this.port = port;
         this.namespace = namespace;
         this.setName = setName;
+        this.objects = objects;
     }
 
     public String getName() {
@@ -69,9 +71,17 @@ public class ConnectionInfo_set implements Serializable{
         this.setName = setName;
     }
 
+    public String getObjects() {
+        return objects;
+    }
+
+    public void setObjects(String objects) {
+        this.objects = objects;
+    }
+
     @Override
     public String toString() {
-        return this.setName;
+        return this.setName+"["+this.objects+"]";
     }
 
 }

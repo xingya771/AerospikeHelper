@@ -39,9 +39,10 @@ public class AerospikeDAO {
 
     public ClientPolicy clientPolicy = new ClientPolicy();
     public List<Host> hostList = new ArrayList<>();
-    private Pattern set_name_pattern = Pattern.compile("set_name=(.*?):");
+    private Pattern set_name_pattern = Pattern.compile("[set_name|set]=(.*?):");
 
     public AerospikeDAO(String ip, int port) {
+        clientPolicy.timeout=20000;
         client = new AerospikeClient(clientPolicy, new Host(ip, port));
 
     }
@@ -72,10 +73,21 @@ public class AerospikeDAO {
         List<String> list = new ArrayList<>();
         Node one_node = this.getClient().getNodes()[0];
         String setsinfo = Info.request(one_node, "sets/" + namespace);
-        Matcher m = set_name_pattern.matcher(setsinfo);
-        while (m.find()) {
-            list.add(m.group(1));
-        }
+        String[] items=setsinfo.split("ns=");
+		for (int i = 0; i < items.length; i++) {
+			if(items[i]==null||items[i].equals("")||items[i].length()<5){
+				continue;
+			}
+			String[] t=items[i].substring(items[i].indexOf(":")+1).split(":");
+			String setName=t[0].split("=")[1];
+			String objects=t[1].split("=")[1];
+                        list.add(setName+"_"+objects);
+		}
+       
+//        Matcher m = set_name_pattern.matcher(setsinfo);
+//        while (m.find()) {
+//            list.add(m.group(1));
+//        }
         return list;
     }
 
@@ -254,6 +266,33 @@ public class AerospikeDAO {
         try {
             while (rs.next()) {
                 handler.handler(rs.getKey(), rs.getRecord());
+            }
+        } finally {
+            rs.close();
+        }
+
+    }
+    
+      /**
+     * 执行查询
+     *
+     * @param policy
+     * @param statement 可使用AerospikeUtil.createStatement方法辅助创建
+     * @return map
+     */
+    public void query(Statement statement, AerospikeQueryHandler handler,int limit) {
+        QueryPolicy policy=new QueryPolicy();
+        policy.sendKey = true;
+        RecordSet rs = getClient().query(policy, statement);
+        int count=0;
+        try {
+            while (rs.next()) {
+                
+                handler.handler(rs.getKey(), rs.getRecord());
+                count+=1;
+                if(count>limit){
+                    break;
+                }
             }
         } finally {
             rs.close();

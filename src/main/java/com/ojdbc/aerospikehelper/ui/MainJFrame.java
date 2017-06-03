@@ -214,8 +214,12 @@ public class MainJFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
             return true;
         }
+        selNode.removeAllChildren();
         for (String set : sets) {
-            ConnectionInfo_set ci_n = new ConnectionInfo_set(ci.getName(), ci.getIp(), ci.getPort(), ci.getNamespace(), set);
+            String setName = set.split("_")[0];
+            String objects = set.split("_")[1];
+
+            ConnectionInfo_set ci_n = new ConnectionInfo_set(ci.getName(), ci.getIp(), ci.getPort(), ci.getNamespace(), setName, objects);
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(ci_n, false);
             selNode.add(node);
             ci.getSets().add(ci_n);
@@ -258,8 +262,13 @@ public class MainJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_del_connJBNMouseReleased
 
     private void closeTabJBNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTabJBNActionPerformed
-        int idx=jTabbedPane1.getSelectedIndex();
-        if(idx!=-1){
+        int idx = jTabbedPane1.getSelectedIndex();
+        if (jTabbedPane1.getSelectedComponent() != null) {
+            ViewerJPanel panel = (ViewerJPanel) jTabbedPane1.getSelectedComponent();
+            panel.close();
+        }
+
+        if (idx != -1) {
             jTabbedPane1.remove(idx);
         }
     }//GEN-LAST:event_closeTabJBNActionPerformed
@@ -281,7 +290,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 cdl.countDown();
             }
         });
-        
+
         dialog.getOkJBT().addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 String name_ui = dialog.getNameJTF().getText();
@@ -336,8 +345,8 @@ public class MainJFrame extends javax.swing.JFrame {
     private void addCard(ConnectionInfo_set ci) {
         ViewerJPanel vjp = new ViewerJPanel();
         vjp.setConnectionInfo_all(ci);
-        jTabbedPane1.addTab(ci.toString()+"["+ci.getName()+"]", vjp);
-        jTabbedPane1.setSelectedIndex(jTabbedPane1.getTabCount()-1);
+        jTabbedPane1.addTab(ci.toString() + "[" + ci.getName() + "]", vjp);
+        jTabbedPane1.setSelectedIndex(jTabbedPane1.getTabCount() - 1);
     }
 
     private AerospikeDAO dao;
