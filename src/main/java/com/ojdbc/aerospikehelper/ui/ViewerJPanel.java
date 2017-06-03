@@ -50,11 +50,11 @@ public class ViewerJPanel extends javax.swing.JPanel {
         initComponents();
         init();
         UIUtil.setKeyMask(commandJTA);
+        JDialog d = showDialog();
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 dao = new AerospikeDAO(connectionInfo_all.getIp(), connectionInfo_all.getPort());
                 this.commandJTA.setText("select * from " + connectionInfo_all.getNamespace() + "." + connectionInfo_all.getSetName() + " where rownum in (0,100)");
-                JDialog d = showDialog();
                 showTable(null, d);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
@@ -223,13 +223,13 @@ public class ViewerJPanel extends javax.swing.JPanel {
     }
 
     public void showTable_thread(Map<String, String> wheres) {
+        JDialog d = showDialog();
+        d.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                close();
+            }
+        });
         selectThread.execute(() -> {
-            JDialog d = showDialog();
-            d.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    close();
-                }
-            });
             this.showTable(wheres, d);
         });
     }
