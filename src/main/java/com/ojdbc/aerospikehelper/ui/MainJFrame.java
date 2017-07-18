@@ -216,8 +216,8 @@ public class MainJFrame extends javax.swing.JFrame {
         }
         selNode.removeAllChildren();
         for (String set : sets) {
-            String setName = set.split("_")[0];
-            String objects = set.split("_")[1];
+            String setName = set.split("&&&")[0];
+            String objects = set.split("&&&")[1];
 
             ConnectionInfo_set ci_n = new ConnectionInfo_set(ci.getName(), ci.getIp(), ci.getPort(), ci.getNamespace(), setName, objects);
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(ci_n, false);
@@ -236,6 +236,8 @@ public class MainJFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connect failed:\n" + StackUtil.getStackTrace(e));
             return true;
         }
+        selNode.removeAllChildren();
+
         for (String namespace : nameSpaces) {
             ConnectionInfo_namespace ci_n = new ConnectionInfo_namespace(ci.getName(), ci.getIp(), ci.getPort(), namespace);
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(ci_n, true);

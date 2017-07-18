@@ -73,7 +73,7 @@ public class AerospikeDAO {
         List<String> list = new ArrayList<>();
         Node one_node = this.getClient().getNodes()[0];
         String setsinfo = Info.request(one_node, "sets/" + namespace);
-        String[] items=setsinfo.split("ns=");
+        String[] items=setsinfo.split("ns=|ns_name=");
 		for (int i = 0; i < items.length; i++) {
 			if(items[i]==null||items[i].equals("")||items[i].length()<5){
 				continue;
@@ -81,7 +81,7 @@ public class AerospikeDAO {
 			String[] t=items[i].substring(items[i].indexOf(":")+1).split(":");
 			String setName=t[0].split("=")[1];
 			String objects=t[1].split("=")[1];
-                        list.add(setName+"_"+objects);
+                        list.add(setName+"&&&"+objects);
 		}
        
 //        Matcher m = set_name_pattern.matcher(setsinfo);
